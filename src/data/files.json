@@ -1,0 +1,46 @@
+{
+  "root": {
+    "type": "dir",
+    "children": [
+      { "name": "docs", "type": "dir" },
+      { "name": "guides", "type": "dir" },
+      { "name": "api", "type": "dir" },
+      { "name": "README.md", "type": "file" },
+      { "name": "CHANGELOG.md", "type": "file" }
+    ]
+  },
+  "docs": {
+    "type": "dir",
+    "children": [
+      { "name": "getting-started.md", "type": "file" },
+      { "name": "architecture.md", "type": "file" },
+      { "name": "configuration.md", "type": "file" },
+      { "name": "deployment.md", "type": "file" },
+      { "name": "guides", "type": "dir" }
+    ]
+  },
+  "docs/guides": {
+    "type": "dir",
+    "children": [
+      { "name": "quickstart.md", "type": "file" },
+      { "name": "best-practices.md", "type": "file" },
+      { "name": "troubleshooting.md", "type": "file" }
+    ]
+  },
+  "guides": {
+    "type": "dir",
+    "children": [
+      { "name": "contributing.md", "type": "file" },
+      { "name": "style-guide.md", "type": "file" },
+      { "name": "testing.md", "type": "file" }
+    ]
+  },
+  "api": {
+    "type": "dir",
+    "children": [
+      { "name": "rest-api.md", "type": "file" },
+      { "name": "graphql-api.md", "type": "file" },
+      { "name": "webhooks.md", "type": "file" }
+    ]
+  }
+}
