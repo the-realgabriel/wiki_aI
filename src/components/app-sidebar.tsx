@@ -11,7 +11,6 @@ import { getAllPages } from "@/lib/wiki"
 const pages = getAllPages()
 
 const data = {
-  user: { name: "shadcn", email: "m@example.com", avatar: "/avatars/shadcn.jpg" },
   navMain: [
     { title: "Dashboard", url: "/", icon: <TerminalSquareIcon />, isActive: true },
     {
@@ -62,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
        
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   )

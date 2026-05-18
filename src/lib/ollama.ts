@@ -1,5 +1,5 @@
-const OLLAMA_BASE_URL = import.meta.env.VITE_OLLAMA_BASE_URL ?? "http://localhost:11434";
-const OLLAMA_MODEL = import.meta.env.VITE_OLLAMA_MODEL ?? "gemma4:e2b ";
+const OLLAMA_BASE_URL = (import.meta.env.VITE_OLLAMA_BASE_URL ?? "http://localhost:11434").replace(/\/+$/g, '');
+const OLLAMA_MODEL = (import.meta.env.VITE_OLLAMA_MODEL ?? "gemma4:e2b").trim();
 
 const SYSTEM_PROMPT = `You are an AI assistant for a wiki knowledge base. Your role is to provide accurate, helpful information based on the wiki content provided to you. Always cite the wiki content when possible and acknowledge when information is beyond the scope of the wiki.`;
 

@@ -1,3 +1,5 @@
+import { useState, type FormEvent } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { cn } from "#lib/utils"
 import { Button } from "#components/ui/button"
 import {
@@ -14,11 +16,35 @@ import {
   FieldLabel,
 } from "#components/ui/field"
 import { Input } from "#components/ui/input"
+import { useAuth } from "#contexts/AuthContext"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { signIn } = useAuth()
+  const navigate = useNavigate()
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+    const form = new FormData(e.currentTarget)
+    try {
+      await signIn(
+        form.get("email") as string,
+        form.get("password") as string,
+      )
+      navigate("/")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -29,12 +55,13 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
@@ -50,15 +77,20 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
               </Field>
+              {error && (
+                <p className="text-sm text-destructive">{error}</p>
+              )}
               <Field>
-                <Button type="submit">Login</Button>
-                <Button variant="outline" type="button">
-                  Login with Google
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Signing in..." : "Login"}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Don&apos;t have an account?{" "}
+                  <Link to="/signup" className="underline underline-offset-4">
+                    Sign up
+                  </Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
