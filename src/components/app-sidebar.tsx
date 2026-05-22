@@ -1,39 +1,50 @@
-import * as React from "react"
+import { useState, useEffect } from "react"
+import type React from "react"
 import { NavMain } from "#components/nav-main"
 import { NavUser } from "#components/nav-user"
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarHeader,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "#components/ui/sidebar"
-import { TerminalSquareIcon, BookOpenIcon, TerminalIcon, SearchIcon, FileArchive } from "lucide-react"
+import { BookOpenIcon, SearchIcon, FileArchive, DatabaseSearch, CalendarDaysIcon } from "lucide-react"
 import { getAllPages } from "@/lib/wiki"
 
-const pages = getAllPages()
+const staticNav: {
+  title: string
+  url: string
+  icon: React.ReactNode
+  isActive?: boolean
+  items?: { title: string; url: string }[]
+}[] = [
+  { title: "Dashboard", url: "/", icon: <DatabaseSearch />, isActive: true },
+  {
+    title: "Files",
+    url: "/files",
+    icon: <FileArchive />,
 
-const data = {
-  navMain: [
-    { title: "Dashboard", url: "/", icon: <TerminalSquareIcon />, isActive: true },
-    {
-      title: "Knowledge Base",
-      url: "/knowledge-base",
-      icon: <BookOpenIcon />,
-      items: pages.map((p) => ({ title: p.title, url: `/knowledge-base/${p.slug}` })),
-    },
-    {
-      title: "Files",
-      url: "/files",
-      icon: <FileArchive />,
-      items: [
-        { title: "docs", url: "/files/docs" },
-        { title: "guides", url: "/files/guides" },
-        { title: "api", url: "/files/api" },
-      ],
-    },
-    { title: "Search", url: "/search", icon: <SearchIcon /> },
-  ],
-}
+  },
+  { title: "Search", url: "/search", icon: <SearchIcon /> },
+  { title: "Calendar", url: "/calendar", icon: <CalendarDaysIcon /> },
+]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [navItems, setNavItems] = useState(staticNav)
+
+  useEffect(() => {
+    getAllPages().then((pages) => {
+      setNavItems([
+        staticNav[0],
+        {
+          title: "Knowledge Base",
+          url: "/knowledge-base",
+          icon: <BookOpenIcon />,
+          items: pages.map((p) => ({ title: p.title, url: `/knowledge-base/${p.slug}` })),
+        },
+        ...staticNav.slice(1),
+      ])
+    })
+  }, [])
+
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -45,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <TerminalIcon className="size-4" />
+                  <DatabaseSearch className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">Dataphyte <b>WIKI</b></span>
@@ -57,8 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-       
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

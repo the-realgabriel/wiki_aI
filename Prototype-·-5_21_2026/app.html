@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoxWiki — App</title>
+<link rel="stylesheet" href="css/wiki.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">V</div>
+      <span class="sidebar-brand">VoxWiki</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <div class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </div>
+        <div class="nav-item" data-view="knowledge">
+          <span class="nav-icon">📖</span>
+          <span class="nav-label">Knowledge Base</span>
+          <span class="nav-count">24</span>
+        </div>
+        <div class="nav-item" data-view="files">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">Files</span>
+          <span class="nav-count">18</span>
+        </div>
+        <div class="nav-item" data-view="search">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Search</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Collaboration</div>
+        <div class="nav-item" data-view="chat">
+          <span class="nav-icon">🤖</span>
+          <span class="nav-label">AI Chat</span>
+        </div>
+        <div class="nav-item" data-view="team">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Team</span>
+        </div>
+        <div class="nav-item" data-view="calendar">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Calendar</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Files</div>
+        <ul class="file-tree">
+          <li>
+            <div class="file-tree-item"><span class="chevron open">▶</span><span class="icon">📂</span><span class="file-tree-label">Engineering</span></div>
+            <ul class="file-tree-children">
+              <li><div class="file-tree-item"><span class="icon">📄</span><span class="file-tree-label">API Auth Guide</span></div></li>
+              <li><div class="file-tree-item"><span class="icon">📄</span><span class="file-tree-label">Database Schema</span></div></li>
+              <li><div class="file-tree-item"><span class="icon">📄</span><span class="file-tree-label">Deployment Runbook</span></div></li>
+            </ul>
+          </li>
+          <li>
+            <div class="file-tree-item"><span class="chevron open">▶</span><span class="icon">📂</span><span class="file-tree-label">Product</span></div>
+            <ul class="file-tree-children">
+              <li><div class="file-tree-item"><span class="icon">📄</span><span class="file-tree-label">Roadmap 2026</span></div></li>
+              <li><div class="file-tree-item"><span class="icon">📄</span><span class="file-tree-label">Feature Specs</span></div></li>
+              <li><div class="file-tree-item"><span class="icon">📄</span><span class="file-tree-label">User Research</span></div></li>
+            </ul>
+          </li>
+          <li>
+            <div class="file-tree-item"><span class="chevron">▶</span><span class="icon">📂</span><span class="file-tree-label">Design</span></div>
+            <ul class="file-tree-children hidden">
+              <li><div class="file-tree-item"><span class="icon">📄</span><span class="file-tree-label">Design System</span></div></li>
+              <li><div class="file-tree-item"><span class="icon">🖼️</span><span class="file-tree-label">Mockups</span></div></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ===== MAIN AREA ===== -->
+  <main class="main-area">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <span style="font-size:0.85rem;font-weight:600;flex-shrink:0;">Dashboard</span>
+      <div class="topbar-search">
+        <span class="search-icon">🔍</span>
+        <input id="global-search" type="text" placeholder="Search knowledge base…" autocomplete="off">
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost btn-icon" onclick="window.location.href='landing.html'" title="Landing">🏠</button>
+        <div style="position:relative;">
+          <button class="btn btn-ghost btn-icon dropdown-toggle" onclick="wiki.toggleDropdown('user-menu')">⚙️</button>
+          <div class="dropdown-menu" id="user-menu">
+            <div class="dropdown-item">👤 Profile</div>
+            <div class="dropdown-item">🎨 Appearance</div>
+            <div class="dropdown-item">🔔 Notifications</div>
+            <div class="dropdown-item">🚪 Sign out</div>
+          </div>
+        </div>
+        <div class="avatar">JD</div>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="content-area">
+
+      <!-- ===== VIEW: Dashboard ===== -->
+      <div class="view-panel" id="view-dashboard">
+        <div class="section-header">
+          <h2>Dashboard</h2>
+          <a href="landing.html" class="btn btn-sm">View Landing</a>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <div class="stat-value">24</div>
+            <div class="stat-label">Knowledge Articles</div>
+            <div class="stat-change positive">↑ 3 this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">18</div>
+            <div class="stat-label">Uploaded Files</div>
+            <div class="stat-change positive">↑ 5 this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">12</div>
+            <div class="stat-label">Team Members</div>
+            <div class="stat-change positive">↑ 2 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">8</div>
+            <div class="stat-label">Active Projects</div>
+            <div class="stat-change negative">↓ 1 this week</div>
+          </div>
+        </div>
+
+        <div class="section-header" style="margin-top:var(--space-lg);">
+          <h3>Recent Activity</h3>
+          <button class="btn btn-sm btn-ghost">View all</button>
+        </div>
+
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-icon">📄</div>
+            <div class="activity-content">
+              <div class="activity-title">API Authentication Guide updated</div>
+              <div class="activity-desc">Sarah added OAuth 2.0 flow documentation</div>
+            </div>
+            <div class="activity-time">2 min ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">📁</div>
+            <div class="activity-content">
+              <div class="activity-title">File uploaded to Engineering</div>
+              <div class="activity-desc">deployment-config-v2.yaml (24 KB)</div>
+            </div>
+            <div class="activity-time">15 min ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">👥</div>
+            <div class="activity-content">
+              <div class="activity-title">Alex joined the team</div>
+              <div class="activity-desc">New engineer, added to Product workspace</div>
+            </div>
+            <div class="activity-time">1 hour ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">🤖</div>
+            <div class="activity-content">
+              <div class="activity-title">AI indexed 3 new files</div>
+              <div class="activity-desc">Q2 roadmap, sprint notes, design specs</div>
+            </div>
+            <div class="activity-time">2 hours ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">📅</div>
+            <div class="activity-content">
+              <div class="activity-title">Sprint Review reminder</div>
+              <div class="activity-desc">Due tomorrow at 10:00 AM</div>
+            </div>
+            <div class="activity-time">3 hours ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW: Knowledge Base ===== -->
+      <div class="view-panel" id="view-knowledge" style="display:none;">
+        <div class="kb-header">
+          <div>
+            <h2>Knowledge Base</h2>
+            <p class="text-muted" style="font-size:0.9rem;">24 articles across 6 categories</p>
+          </div>
+          <div style="display:flex;gap:var(--space-sm);">
+            <button class="btn btn-sm">Sort</button>
+            <button class="btn btn-sm btn-primary">+ New Article</button>
+          </div>
+        </div>
+
+        <div class="tabs" data-tab-group="kb">
+          <div class="tab active" data-tab="all">All</div>
+          <div class="tab" data-tab="engineering">Engineering</div>
+          <div class="tab" data-tab="product">Product</div>
+          <div class="tab" data-tab="design">Design</div>
+          <div class="tab" data-tab="operations">Operations</div>
+        </div>
+
+        <div data-tab-group="kb">
+          <div data-tab-panel="all">
+            <div class="kb-grid">
+              <div class="kb-card">
+                <div class="kb-icon">🔐</div>
+                <h3>API Authentication Guide</h3>
+                <p>OAuth 2.0 flows, API key management, and rate limiting for production services.</p>
+                <div class="kb-meta"><span>Engineering</span><span>Updated 2d ago</span><span>4 min read</span></div>
+              </div>
+              <div class="kb-card">
+                <div class="kb-icon">🗄️</div>
+                <h3>Database Schema Overview</h3>
+                <p>Core tables, relationships, and indexing strategy for the application database.</p>
+                <div class="kb-meta"><span>Engineering</span><span>Updated 5d ago</span><span>8 min read</span></div>
+              </div>
+              <div class="kb-card">
+                <div class="kb-icon">🎨</div>
+                <h3>Design System — Components</h3>
+                <p>Button, input, card, and navigation component specifications with usage guidelines.</p>
+                <div class="kb-meta"><span>Design</span><span>Updated 1w ago</span><span>6 min read</span></div>
+              </div>
+              <div class="kb-card">
+                <div class="kb-icon">🚀</div>
+                <h3>Deployment Checklist</h3>
+                <p>Pre-flight checks, environment variables, and rollback procedures for releases.</p>
+                <div class="kb-meta"><span>Operations</span><span>Updated 3d ago</span><span>3 min read</span></div>
+              </div>
+              <div class="kb-card">
+                <div class="kb-icon">🗺️</div>
+                <h3>Product Roadmap Q2 2026</h3>
+                <p>Strategic priorities, feature releases, and milestones for the quarter.</p>
+                <div class="kb-meta"><span>Product</span><span>Updated 1w ago</span><span>5 min read</span></div>
+              </div>
+              <div class="kb-card">
+                <div class="kb-icon">📘</div>
+                <h3>Onboarding Guide</h3>
+                <p>Setup instructions, repo structure, and first sprint expectations for new team members.</p>
+                <div class="kb-meta"><span>Engineering</span><span>Updated 2w ago</span><span>10 min read</span></div>
+              </div>
+            </div>
+          </div>
+          <div data-tab-panel="engineering" style="display:none;">
+            <div class="kb-grid">
+              <div class="kb-card"><div class="kb-icon">🔐</div><h3>API Authentication Guide</h3><p>OAuth 2.0 flows, API key management, and rate limiting.</p><div class="kb-meta"><span>Engineering</span><span>Updated 2d ago</span></div></div>
+              <div class="kb-card"><div class="kb-icon">🗄️</div><h3>Database Schema Overview</h3><p>Core tables, relationships, and indexing strategy.</p><div class="kb-meta"><span>Engineering</span><span>Updated 5d ago</span></div></div>
+              <div class="kb-card"><div class="kb-icon">📘</div><h3>Onboarding Guide</h3><p>Setup instructions and first sprint expectations.</p><div class="kb-meta"><span>Engineering</span><span>Updated 2w ago</span></div></div>
+            </div>
+          </div>
+          <div data-tab-panel="product" style="display:none;">
+            <div class="kb-grid">
+              <div class="kb-card"><div class="kb-icon">🗺️</div><h3>Product Roadmap Q2 2026</h3><p>Strategic priorities and feature releases.</p><div class="kb-meta"><span>Product</span><span>Updated 1w ago</span></div></div>
+            </div>
+          </div>
+          <div data-tab-panel="design" style="display:none;">
+            <div class="kb-grid">
+              <div class="kb-card"><div class="kb-icon">🎨</div><h3>Design System — Components</h3><p>Component specifications with usage guidelines.</p><div class="kb-meta"><span>Design</span><span>Updated 1w ago</span></div></div>
+            </div>
+          </div>
+          <div data-tab-panel="operations" style="display:none;">
+            <div class="kb-grid">
+              <div class="kb-card"><div class="kb-icon">🚀</div><h3>Deployment Checklist</h3><p>Pre-flight checks and rollback procedures.</p><div class="kb-meta"><span>Operations</span><span>Updated 3d ago</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW: Files ===== -->
+      <div class="view-panel" id="view-files" style="display:none;">
+        <div class="section-header">
+          <h2>Files</h2>
+          <button class="btn btn-sm btn-primary">+ Upload</button>
+        </div>
+
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">📤</div>
+          <div class="upload-text">Drop files here or click to upload</div>
+          <div class="upload-hint">Supports PDF, images, documents, code files — up to 50 MB each</div>
+          <input type="file" id="file-input" style="display:none" multiple>
+        </div>
+
+        <div id="uploaded-files" style="margin-top:var(--space-md);"></div>
+
+        <div style="margin-top:var(--space-lg);">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon">📄</div>
+              <div class="activity-content">
+                <div class="activity-title">deployment-config-v2.yaml</div>
+                <div class="activity-desc">24 KB — Engineering</div>
+              </div>
+              <div><span class="badge badge-accent">YAML</span></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🖼️</div>
+              <div class="activity-content">
+                <div class="activity-title">dashboard-mockup-v3.png</div>
+                <div class="activity-desc">2.4 MB — Design</div>
+              </div>
+              <div><span class="badge badge-accent">Image</span></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">📕</div>
+              <div class="activity-content">
+                <div class="activity-title">Q2-2026-Product-Plan.pdf</div>
+                <div class="activity-desc">1.8 MB — Product</div>
+              </div>
+              <div><span class="badge badge-accent">PDF</span></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">📄</div>
+              <div class="activity-content">
+                <div class="activity-title">sprint-notes-may-2026.md</div>
+                <div class="activity-desc">12 KB — Engineering</div>
+              </div>
+              <div><span class="badge badge-accent">Markdown</span></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">📄</div>
+              <div class="activity-content">
+                <div class="activity-title">api-spec-v2.openapi.json</div>
+                <div class="activity-desc">86 KB — Engineering</div>
+              </div>
+              <div><span class="badge badge-accent">JSON</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW: Search ===== -->
+      <div class="view-panel" id="view-search" style="display:none;">
+        <div class="section-header">
+          <h2>Search</h2>
+          <span class="text-muted text-sm">Semantic search across the entire knowledge base</span>
+        </div>
+
+        <div style="max-width:640px;margin-bottom:var(--space-lg);position:relative;">
+          <input type="text" id="search-page-input" class="global-search-large" placeholder="Search by topic, file, or question…" style="width:100%;height:48px;padding:0 48px 0 16px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:1rem;outline:none;font-family:var(--font-body);background:var(--surface);" oninput="wiki.performSearch(this.value)">
+          <span style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:1.2rem;">🔍</span>
+        </div>
+
+        <div id="search-results"></div>
+      </div>
+
+      <!-- ===== VIEW: AI Chat ===== -->
+      <div class="view-panel" id="view-chat" style="display:none;">
+        <div class="section-header">
+          <h2>AI Chat</h2>
+          <span class="text-muted text-sm">Ask questions about your knowledge base</span>
+        </div>
+
+        <div class="chat-panel">
+          <div class="chat-header">
+            <span>🤖</span>
+            <span>Wiki Assistant</span>
+            <span class="badge badge-accent" style="margin-left:auto;">Powered by AI</span>
+          </div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ask anything about your wiki…" rows="1"></textarea>
+            <button class="btn btn-primary" id="chat-send">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW: Team ===== -->
+      <div class="view-panel" id="view-team" style="display:none;">
+        <div class="section-header">
+          <h2>Team</h2>
+          <button class="btn btn-sm btn-primary">+ Invite</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-md);">
+          <div class="stat-card" style="display:flex;align-items:center;gap:var(--space-md);">
+            <div class="avatar" style="width:44px;height:44px;font-size:0.9rem;">JD</div>
+            <div>
+              <div style="font-weight:600;">Jamie Doe</div>
+              <div class="text-muted text-sm">Lead Engineer</div>
+              <div style="display:flex;gap:4px;margin-top:4px;"><span class="badge badge-accent">Admin</span><span class="badge badge-success">Online</span></div>
+            </div>
+          </div>
+          <div class="stat-card" style="display:flex;align-items:center;gap:var(--space-md);">
+            <div class="avatar" style="width:44px;height:44px;font-size:0.9rem;background:var(--accent);">SC</div>
+            <div>
+              <div style="font-weight:600;">Sarah Chen</div>
+              <div class="text-muted text-sm">Product Manager</div>
+              <div style="display:flex;gap:4px;margin-top:4px;"><span class="badge badge-accent">Editor</span><span class="badge badge-success">Online</span></div>
+            </div>
+          </div>
+          <div class="stat-card" style="display:flex;align-items:center;gap:var(--space-md);">
+            <div class="avatar" style="width:44px;height:44px;font-size:0.9rem;background:var(--accent-secondary);">MR</div>
+            <div>
+              <div style="font-weight:600;">Marcus Rivera</div>
+              <div class="text-muted text-sm">Design Lead</div>
+              <div style="display:flex;gap:4px;margin-top:4px;"><span class="badge badge-accent">Editor</span><span class="badge badge-warning">Away</span></div>
+            </div>
+          </div>
+          <div class="stat-card" style="display:flex;align-items:center;gap:var(--space-md);">
+            <div class="avatar" style="width:44px;height:44px;font-size:0.9rem;background:var(--warning);">AT</div>
+            <div>
+              <div style="font-weight:600;">Alex Torres</div>
+              <div class="text-muted text-sm">Engineer</div>
+              <div style="display:flex;gap:4px;margin-top:4px;"><span class="badge badge-accent">Viewer</span><span style="color:var(--muted);font-size:0.75rem;">Offline</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW: Calendar ===== -->
+      <div class="view-panel" id="view-calendar" style="display:none;">
+        <div class="calendar-header">
+          <div>
+            <h2 id="calendar-month-title">May 2026</h2>
+          </div>
+          <div style="display:flex;gap:var(--space-sm);">
+            <button class="btn btn-sm btn-ghost" id="cal-prev">←</button>
+            <button class="btn btn-sm btn-ghost" id="cal-next">→</button>
+          </div>
+        </div>
+
+        <div class="calendar-grid" id="calendar-grid"></div>
+
+        <div style="display:flex;gap:var(--space-lg);margin-top:var(--space-lg);flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:var(--space-sm);"><div style="width:12px;height:12px;border-radius:3px;background:var(--accent);"></div><span class="text-sm text-muted">Meeting</span></div>
+          <div style="display:flex;align-items:center;gap:var(--space-sm);"><div style="width:12px;height:12px;border-radius:3px;background:var(--danger);"></div><span class="text-sm text-muted">Deadline</span></div>
+          <div style="display:flex;align-items:center;gap:var(--space-sm);"><div style="width:12px;height:12px;border-radius:3px;background:var(--accent-secondary);"></div><span class="text-sm text-muted">Milestone</span></div>
+        </div>
+
+        <div style="margin-top:var(--space-lg);">
+          <div class="section-header"><h3>Upcoming Deadlines</h3></div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon" style="background:color-mix(in srgb, var(--danger) 12%, transparent);">⏰</div>
+              <div class="activity-content">
+                <div class="activity-title">API Docs Deadline</div>
+                <div class="activity-desc">May 25 — Engineering team</div>
+              </div>
+              <div><span class="badge badge-danger">3 days</span></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:color-mix(in srgb, var(--accent-secondary) 12%, transparent);">🎯</div>
+              <div class="activity-content">
+                <div class="activity-title">Q2 Milestone Review</div>
+                <div class="activity-desc">May 28 — All teams</div>
+              </div>
+              <div><span class="badge badge-warning">6 days</span></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:color-mix(in srgb, var(--accent) 12%, transparent);">👥</div>
+              <div class="activity-content">
+                <div class="activity-title">Design Review</div>
+                <div class="activity-desc">June 1 — Design + Product</div>
+              </div>
+              <div><span class="badge badge-accent">10 days</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="js/wiki.js"></script>
+</body>
+</html>

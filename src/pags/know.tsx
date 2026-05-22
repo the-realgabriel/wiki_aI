@@ -1,12 +1,13 @@
+import { useState, useEffect } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import { getAllPages } from "@/lib/wiki"
+import { getAllPages, getPageBySlug } from "@/lib/wiki"
 import { Link, useParams } from "react-router-dom"
-import { getPageBySlug } from "@/lib/wiki"
+import type { WikiPage } from "@/lib/wiki"
 import Markdown from "react-markdown"
 import { SummaryButton } from "@/components/summary-button"
 import { ChatPanel } from "@/components/chat-panel"
@@ -14,7 +15,20 @@ import { ArrowLeft, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 function KnowledgeBaseList() {
-  const pages = getAllPages()
+  const [pages, setPages] = useState<WikiPage[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getAllPages().then(setPages).finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-4" />
+      </div>
+    )
+  }
 
   return (
     <>
@@ -57,7 +71,25 @@ function KnowledgeBaseList() {
 
 function KnowledgeBasePage() {
   const { slug } = useParams<{ slug: string }>()
-  const page = slug ? getPageBySlug(slug) : undefined
+  const [page, setPage] = useState<WikiPage | undefined>(undefined)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (slug) {
+      setLoading(true)
+      getPageBySlug(slug).then(setPage).finally(() => setLoading(false))
+    } else {
+      setLoading(false)
+    }
+  }, [slug])
+
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-4" />
+      </div>
+    )
+  }
 
   if (!page) {
     return (

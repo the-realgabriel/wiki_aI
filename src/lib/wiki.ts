@@ -1,4 +1,4 @@
-import pagesData from "../data/pages.json";
+import { getRows } from './rest';
 
 export type WikiPage = {
   slug: string;
@@ -7,17 +7,29 @@ export type WikiPage = {
   content: string;
 };
 
-export function getAllPages(): WikiPage[] {
-  return pagesData as WikiPage[];
+function mapPage(row: any): WikiPage {
+  return {
+    slug: row.slug,
+    title: row.title,
+    tags: row.tags || [],
+    content: row.content || "",
+  };
 }
 
-export function getPageBySlug(slug: string): WikiPage | undefined {
-  return (pagesData as WikiPage[]).find((p) => p.slug === slug);
+export async function getAllPages(): Promise<WikiPage[]> {
+  const rows = await getRows("wiki_pages", { order: "title.asc" });
+  return rows.map(mapPage);
 }
 
-export function searchPages(query: string): WikiPage[] {
+export async function getPageBySlug(slug: string): Promise<WikiPage | undefined> {
+  const rows = await getRows("wiki_pages", { slug: `eq.${slug}` });
+  return rows.length > 0 ? mapPage(rows[0]) : undefined;
+}
+
+export async function searchPages(query: string): Promise<WikiPage[]> {
   const q = query.toLowerCase();
-  return (pagesData as WikiPage[]).filter(
+  const all = await getAllPages();
+  return all.filter(
     (p) =>
       p.title.toLowerCase().includes(q) ||
       p.content.toLowerCase().includes(q) ||

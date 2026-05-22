@@ -6,7 +6,7 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -35,8 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string) => {
-    const res = await apiSignUp(email, password);
+  const signUp = useCallback(async (email: string, password: string, username: string) => {
+    const res = await apiSignUp(email, password, username);
     setUser(res.user);
   }, []);
 

@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoxWiki — AI-Powered Knowledge Base</title>
+<link rel="stylesheet" href="css/wiki.css">
+<style>
+  /* Landing-specific overrides */
+  .landing-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-md) var(--space-xl);
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .landing-nav .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .landing-nav .nav-links { display: flex; gap: var(--space-lg); margin-left: auto; align-items: center; }
+  .landing-nav .nav-links a { color: var(--fg); font-weight: 500; font-size: 0.9rem; }
+  .landing-nav .nav-links a:hover { color: var(--accent); }
+
+  .landing-hero {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+    align-items: center;
+    min-height: 70vh;
+  }
+  .landing-hero h1 {
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.1;
+    margin-bottom: var(--space-lg);
+  }
+  .landing-hero h1 span { color: var(--accent); }
+  .landing-hero p {
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin-bottom: var(--space-xl);
+    max-width: 480px;
+    line-height: 1.6;
+  }
+  .landing-hero .cta-group { display: flex; gap: var(--space-md); flex-wrap: wrap; }
+  .landing-hero .hero-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-lg);
+  }
+  .hero-preview .preview-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .hero-preview .preview-dots { display: flex; gap: 6px; }
+  .hero-preview .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .hero-preview .preview-dot:nth-child(1) { background: var(--danger); }
+  .hero-preview .preview-dot:nth-child(2) { background: var(--warning); }
+  .hero-preview .preview-dot:nth-child(3) { background: var(--success); }
+  .preview-sidebar {
+    width: 48px;
+    background: var(--sidebar-bg);
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--space-sm);
+    float: left;
+    margin-right: var(--space-md);
+  }
+  .preview-sidebar div {
+    width: 32px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+  }
+  .preview-sidebar div:nth-child(1) { background: var(--accent); width: 28px; }
+  .preview-content { overflow: hidden; }
+  .preview-content .line { height: 10px; background: var(--border); border-radius: 5px; margin-bottom: 8px; }
+  .preview-content .line:nth-child(1) { width: 70%; }
+  .preview-content .line:nth-child(2) { width: 90%; }
+  .preview-content .line:nth-child(3) { width: 40%; }
+
+  .feature-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+  .feature-section .section-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: var(--space-md);
+  }
+  .feature-section h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    margin-bottom: var(--space-lg);
+    max-width: 600px;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl);
+    transition: box-shadow 0.15s;
+  }
+  .feature-card:hover { box-shadow: var(--shadow-md); }
+  .feature-card .feature-icon {
+    width: 48px;
+    height: 48px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: var(--space-md);
+  }
+  .feature-card h3 { font-size: 1.1rem; margin-bottom: var(--space-sm); }
+  .feature-card p { font-size: 0.9rem; color: var(--muted); margin-bottom: 0; }
+
+  .testimonial-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+    text-align: center;
+  }
+  .testimonial-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .testimonial-card blockquote {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: var(--space-lg);
+    color: var(--fg);
+  }
+  .testimonial-card cite {
+    font-style: normal;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .testimonial-card cite strong { color: var(--fg); }
+
+  .cta-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+    text-align: center;
+  }
+  .cta-card {
+    background: linear-gradient(135deg, var(--accent), oklch(50% 0.14 180));
+    color: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-3xl) var(--space-xl);
+  }
+  .cta-card h2 { color: white; font-size: clamp(1.5rem, 3vw, 2.25rem); margin-bottom: var(--space-md); }
+  .cta-card p { opacity: 0.85; max-width: 480px; margin: 0 auto var(--space-lg); }
+  .cta-card .btn {
+    background: white;
+    color: var(--accent);
+    border: none;
+    padding: 12px 32px;
+    font-size: 1rem;
+  }
+  .cta-card .btn:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+
+  .landing-footer {
+    border-top: 1px solid var(--border);
+    padding: var(--space-xl) var(--space-xl);
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+  .landing-footer .footer-links { display: flex; gap: var(--space-lg); }
+  .landing-footer .footer-links a { color: var(--muted); font-size: 0.85rem; }
+
+  @media (max-width: 768px) {
+    .landing-hero { grid-template-columns: 1fr; min-height: auto; gap: var(--space-xl); }
+    .landing-hero .hero-preview { order: -1; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .landing-nav { flex-wrap: wrap; }
+    .landing-nav .nav-links { margin-left: 0; width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="landing-nav">
+  <div class="nav-brand">
+    <div class="sidebar-logo">V</div>
+    VoxWiki
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="app.html">Open App</a>
+    <a href="#" class="btn btn-primary btn-sm">Get Started</a>
+  </div>
+</nav>
+
+<section class="landing-hero">
+  <div>
+    <h1>Your team's knowledge,<br><span>powered by AI</span></h1>
+    <p>VoxWiki is an intelligent knowledge base that organizes your documents, files, and team knowledge into a searchable wiki with AI-powered chat, semantic search, and smart file management.</p>
+    <div class="cta-group">
+      <a href="app.html" class="btn btn-primary">Launch App</a>
+      <a href="#features" class="btn">See Features</a>
+    </div>
+  </div>
+  <div class="hero-preview">
+    <div class="preview-bar">
+      <div class="preview-dots">
+        <span class="preview-dot"></span>
+        <span class="preview-dot"></span>
+        <span class="preview-dot"></span>
+      </div>
+      <span style="font-size:0.75rem;color:var(--muted);">VoxWiki Dashboard</span>
+    </div>
+    <div style="display:flex;">
+      <div class="preview-sidebar">
+        <div></div><div></div><div></div><div></div><div></div>
+      </div>
+      <div class="preview-content">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line" style="width:60%;"></div>
+        <div class="line" style="width:80%;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="feature-section" id="features">
+  <div class="section-label">Features</div>
+  <h2>Everything you need to organize and find knowledge</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🔍</div>
+      <h3>Semantic Search</h3>
+      <p>Find any document, note, or file by meaning — not just keywords. AI understands context and intent.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Chat Assistant</h3>
+      <p>Ask questions about your knowledge base in natural language. Get summaries, answers, and drafts instantly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📁</div>
+      <h3>Smart File Tree</h3>
+      <p>Drag-and-drop file organization with automatic indexing. Supports documents, images, PDFs, and code files.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <h3>Team Collaboration</h3>
+      <p>Real-time editing, comments, and notifications. Keep your team aligned with shared workspaces.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📅</div>
+      <h3>Calendar & Deadlines</h3>
+      <p>Track project milestones, document deadlines, and team events directly within your wiki.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Smart Indexing</h3>
+      <p>Upload files and they're automatically indexed, categorized, and made searchable by the AI engine.</p>
+    </div>
+  </div>
+</section>
+
+<section class="testimonial-section">
+  <div class="testimonial-card">
+    <blockquote>"VoxWiki transformed how our team discovers and shares knowledge. The AI search alone saves us hours each week."</blockquote>
+    <cite>— <strong>Sarah Chen</strong>, VP Engineering at DataForge</cite>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-card">
+    <h2>Ready to organize your team's knowledge?</h2>
+    <p>Start with one workspace, invite your team, and let AI do the rest.</p>
+    <a href="app.html" class="btn">Launch VoxWiki →</a>
+  </div>
+</section>
+
+<footer class="landing-footer">
+  <div style="font-size:0.85rem;color:var(--muted);">© 2026 VoxWiki</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="app.html">App</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+  </div>
+</footer>
+
+</body>
+</html>

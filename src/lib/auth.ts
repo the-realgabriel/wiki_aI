@@ -96,11 +96,11 @@ async function tryRefresh(): Promise<boolean> {
   }
 }
 
-export async function signUp(email: string, password: string): Promise<AuthResponse> {
+export async function signUp(email: string, password: string, name: string): Promise<AuthResponse> {
   const res = await fetch(buildApiUrl('/auth/signup'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, name }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: 'Signup failed' }));

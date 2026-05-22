@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoxWiki — AI Wiki Project</title>
+<link rel="stylesheet" href="css/wiki.css">
+<style>
+  .launcher {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    text-align: center;
+  }
+  .launcher .logo {
+    width: 56px;
+    height: 56px;
+    background: var(--accent);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: var(--space-md);
+  }
+  .launcher h1 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    margin-bottom: var(--space-sm);
+  }
+  .launcher p {
+    color: var(--muted);
+    max-width: 480px;
+    margin-bottom: var(--space-xl);
+  }
+  .launcher .card-grid {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .launcher .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl) var(--space-lg);
+    width: 220px;
+    text-align: center;
+    transition: all 0.15s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .launcher .card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+  }
+  .launcher .card .card-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-sm);
+  }
+  .launcher .card .card-title {
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+  }
+  .launcher .card .card-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .launcher .card .card-badge {
+    display: inline-block;
+    margin-top: var(--space-sm);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="launcher">
+  <div class="logo">V</div>
+  <h1>VoxWiki</h1>
+  <p>AI-powered knowledge base with smart search, file management, team collaboration, and calendar planning.</p>
+
+  <div class="card-grid">
+    <a class="card" href="app.html">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Launch App</div>
+      <div class="card-desc">Dashboard, files, search, AI chat, team &amp; calendar</div>
+      <div class="card-badge">Open →</div>
+    </a>
+    <a class="card" href="landing.html">
+      <div class="card-icon">🌐</div>
+      <div class="card-title">Landing Page</div>
+      <div class="card-desc">Marketing site with features, testimonials &amp; CTA</div>
+      <div class="card-badge">View →</div>
+    </a>
+  </div>
+
+  <div style="margin-top:var(--space-xl);font-size:0.8rem;color:var(--muted);">
+    Responsive web prototype — 2026
+  </div>
+</div>
+
+</body>
+</html>

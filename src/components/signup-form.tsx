@@ -42,7 +42,7 @@ export function SignupForm({
     }
 
     try {
-      await signUp(form.get("email") as string, password)
+      await signUp(form.get("email") as string, password, form.get("name") as string)
       navigate("/")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed")
@@ -64,8 +64,8 @@ export function SignupForm({
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <Input id="name" name="name" type="text" placeholder="John Doe" />
+                <FieldLabel htmlFor="username">Username</FieldLabel>
+                <Input id="username" name="username" type="text" placeholder="John Doe" required />
               </Field>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>

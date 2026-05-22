@@ -1,5 +1,4 @@
-import filesystem from "../data/files.json";
-import fileContents from "../data/file-contents.json";
+import { getRows } from './rest';
 
 export type FileEntry = {
   name: string;
@@ -18,56 +17,41 @@ export type FileData = {
   content: string;
 };
 
-function simulateLatency(): Promise<void> {
-  const delay = 100 + Math.random() * 200;
-  return new Promise((r) => setTimeout(r, delay));
-}
-
-function normalizePath(path: string): string {
-  return path.replace(/^\/+|\/+$/g, "").replace(/\/+/g, "/");
-}
-
 export async function fetchDirListing(path: string): Promise<DirListing> {
-  await simulateLatency();
-
-  const normalized = normalizePath(path);
-  const key = normalized || "root";
-  const dir = (filesystem as Record<string, { type: string; children: FileEntry[] }>)[key];
-
-  if (!dir || dir.type !== "dir") {
-    throw new Error(`Directory not found: ${path}`);
+  const normalized = path.replace(/^\/+|\/+$/g, "");
+  const parentPath = normalized || "";
+  const params: Record<string, string> = {
+    select: "name,type,path",
+    order: "type.desc,name.asc",
+  };
+  if (parentPath) {
+    params["parent_path"] = `eq.${parentPath}`;
+  } else {
+    params["parent_path"] = "is.null";
   }
-
-  const parentPath = normalized.includes("/")
-    ? normalized.substring(0, normalized.lastIndexOf("/")) || null
-    : null;
+  const rows = await getRows("wiki_files", params);
 
   return {
     path: normalized || "/",
-    entries: dir.children.sort((a, b) => {
-      if (a.type !== b.type) return a.type === "dir" ? -1 : 1;
-      return a.name.localeCompare(b.name);
-    }),
-    parentPath,
+    entries: rows.map((r: any) => ({ name: r.name, type: r.type })),
+    parentPath: parentPath ? (parentPath.includes("/") ? parentPath.substring(0, parentPath.lastIndexOf("/")) : null) : null,
   };
 }
 
 export async function fetchFileContent(path: string): Promise<FileData> {
-  await simulateLatency();
+  const normalized = path.replace(/^\/+|\/+$/g, "");
+  const rows = await getRows("wiki_files", {
+    path: `eq.${normalized}`,
+  });
 
-  const normalized = normalizePath(path);
-  const contents = fileContents as Record<string, string>;
-  const content = contents[normalized];
+  if (rows.length === 0) throw new Error(`File not found: ${path}`);
 
-  if (!content) {
-    throw new Error(`File not found: ${path}`);
-  }
-
+  const file = rows[0];
   const name = normalized.split("/").pop() || normalized;
 
   return {
     path: normalized,
     name,
-    content,
+    content: file.content || "",
   };
 }
