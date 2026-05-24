@@ -17,6 +17,8 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    host: '0.0.0.0',
+    cors: true,
     proxy: {
       '/auth': {
         target: 'http://localhost:3000',
