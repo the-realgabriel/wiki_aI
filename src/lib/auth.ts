@@ -14,6 +14,8 @@ export type AuthResponse = {
   token_type: string;
 };
 
+let accessToken: string | null = null;
+
 function buildApiUrl(path: string) {
   if (/^https?:\/\//i.test(path)) {
     return path;
@@ -21,13 +23,26 @@ function buildApiUrl(path: string) {
   return API_BASE ? `${API_BASE}${path}` : path;
 }
 
+function isAllowedOrigin(url: string): boolean {
+  if (!url.startsWith('http')) return true;
+  try {
+    const target = new URL(url);
+    const current = new URL(window.location.origin);
+    return target.origin === current.origin;
+  } catch {
+    return false;
+  }
+}
+
 function storeAuth(data: AuthResponse) {
+  accessToken = data.access_token;
   localStorage.setItem('access_token', data.access_token);
   localStorage.setItem('refresh_token', data.refresh_token);
   localStorage.setItem('user', JSON.stringify(data.user));
 }
 
 function clearAuth() {
+  accessToken = null;
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
   localStorage.removeItem('user');
@@ -39,7 +54,7 @@ export function getStoredUser(): User | null {
 }
 
 export function getAccessToken(): string | null {
-  return localStorage.getItem('access_token');
+  return accessToken;
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -48,9 +63,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
   const url = buildApiUrl(path);
+  if (token && isAllowedOrigin(url)) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(url, { ...options, headers });
 
   if (res.status === 401) {
@@ -141,5 +158,23 @@ export async function signOut(): Promise<void> {
 }
 
 export async function getMe(): Promise<User> {
+  const stored = getStoredUser();
+  if (stored && !getAccessToken()) {
+    const refreshed = await tryRefresh();
+    if (refreshed) {
+      return request<User>('/auth/me');
+    }
+    clearAuth();
+    throw new Error('Session expired');
+  }
   return request<User>('/auth/me');
 }
+
+export function initAuth() {
+  const stored = getStoredUser();
+  if (stored) {
+    accessToken = localStorage.getItem('access_token');
+  }
+}
+
+initAuth();

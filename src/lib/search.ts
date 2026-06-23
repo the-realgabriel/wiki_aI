@@ -1,5 +1,5 @@
 import { getAllPages } from './wiki'
-import { getRows } from './rest'
+import { searchFiles as apiSearchFiles } from './wiki-api'
 import { generateEmbedding, indexDocuments, semanticSearch, type IndexedDoc } from './embeddings'
 
 export type SearchResult = {
@@ -59,15 +59,12 @@ export async function searchFiles(query: string): Promise<SearchResult[]> {
   const q = query.toLowerCase().trim()
   if (!q) return []
 
-  const rows = await getRows("wiki_files", {
-    type: "eq.file",
-    select: "path,name,content",
-  })
+  const rows = await apiSearchFiles(q).catch(() => [])
 
   const results: SearchResult[] = []
 
   for (const file of rows) {
-    const name = file.name || file.path.split("/").pop()
+    const name = file.name || file.path.split("/").pop() || file.path
     const content: string = file.content || ""
     const matchesName = name.toLowerCase().includes(q)
     const matchesContent = content.toLowerCase().includes(q)
@@ -94,7 +91,7 @@ export async function semanticSearchAll(query: string): Promise<{
 
   const [pages, fileRows] = await Promise.all([
     getAllPages(),
-    getRows("wiki_files", { select: "path,name,content" }).catch(() => []),
+    apiSearchFiles('').catch(() => []),
   ])
 
   const docs: IndexedDoc[] = [

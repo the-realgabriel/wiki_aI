@@ -1,5 +1,3 @@
-import { getRows } from './rest';
-
 export type FileEntry = {
   name: string;
   type: "file" | "dir";
@@ -17,19 +15,25 @@ export type FileData = {
   content: string;
 };
 
+async function apiFetch(url: string) {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Request failed" }));
+    throw new Error(err.error || `Request failed (${res.status})`);
+  }
+  return res.json();
+}
+
 export async function fetchDirListing(path: string): Promise<DirListing> {
   const normalized = path.replace(/^\/+|\/+$/g, "");
   const parentPath = normalized || "";
-  const params: Record<string, string> = {
-    select: "name,type,path",
-    order: "type.desc,name.asc",
-  };
+  const params = new URLSearchParams();
   if (parentPath) {
-    params["parent_path"] = `eq.${parentPath}`;
+    params.set("parent_path", `eq.${parentPath}`);
   } else {
-    params["parent_path"] = "is.null";
+    params.set("parent_path", "is.null");
   }
-  const rows = await getRows("wiki_files", params);
+  const rows = await apiFetch(`/api/files?${params}`);
 
   return {
     path: normalized || "/",
@@ -40,18 +44,24 @@ export async function fetchDirListing(path: string): Promise<DirListing> {
 
 export async function fetchFileContent(path: string): Promise<FileData> {
   const normalized = path.replace(/^\/+|\/+$/g, "");
-  const rows = await getRows("wiki_files", {
-    path: `eq.${normalized}`,
-  });
-
-  if (rows.length === 0) throw new Error(`File not found: ${path}`);
-
-  const file = rows[0];
-  const name = normalized.split("/").pop() || normalized;
-
+  const data = await apiFetch(`/api/files/content?path=${encodeURIComponent(normalized)}`);
   return {
     path: normalized,
-    name,
-    content: file.content || "",
+    name: normalized.split("/").pop() || normalized,
+    content: data.content || "",
   };
+}
+
+export async function fetchAllFiles(): Promise<any[]> {
+  return apiFetch("/api/files");
+}
+
+export async function deleteFile(path: string): Promise<void> {
+  const res = await fetch(`/api/files?path=${encodeURIComponent(path)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Delete failed" }));
+    throw new Error(err.error || "Delete failed");
+  }
 }

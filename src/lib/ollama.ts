@@ -21,7 +21,17 @@ async function ollamaChat(
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Ollama API error: ${err}`);
+    if (res.status === 404) {
+      throw new Error(`Ollama model "${OLLAMA_MODEL}" not found. Pull it with: ollama pull ${OLLAMA_MODEL}`);
+    }
+    if (res.status === 403) {
+      throw new Error(
+        `Ollama returned 403. The proxy is likely forwarding your auth token to Ollama. ` +
+        `Try setting VITE_OLLAMA_BASE_URL=http://localhost:11434 (direct connection) or ` +
+        `check if Ollama requires authentication. Response: ${err}`
+      );
+    }
+    throw new Error(`Ollama API error (${res.status}): ${err}`);
   }
 
   const data = await res.json();
@@ -58,4 +68,69 @@ export async function chatWithWiki(
     max_tokens: 500,
     temperature: 0,
   });
+}
+
+export type ChatEvent = {
+  type: 'searching'
+  query: string
+} | {
+  type: 'search_complete'
+  resultCount: number
+} | {
+  type: 'token'
+  content: string
+} | {
+  type: 'done'
+} | {
+  type: 'error'
+  message: string
+}
+
+export async function chatWithWebSearch(
+  messages: { role: string; content: string }[],
+  pageContent: string,
+  onEvent: (event: ChatEvent) => void,
+): Promise<string> {
+  const apiBase = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/g, '')
+  const res = await fetch(`${apiBase}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, pageContent }),
+  })
+
+  if (!res.ok) {
+    const err = await res.text().catch(() => 'Unknown error')
+    throw new Error(`Chat API error (${res.status}): ${err}`)
+  }
+
+  const reader = res.body!.getReader()
+  const decoder = new TextDecoder()
+  let fullContent = ''
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() || ''
+
+    for (const line of lines) {
+      const trimmed = line.trim()
+      if (!trimmed.startsWith('data: ')) continue
+      try {
+        const data = JSON.parse(trimmed.slice(6))
+        const event = data as ChatEvent
+        onEvent(event)
+        if (event.type === 'token') {
+          fullContent += event.content
+        }
+      } catch {
+        // skip malformed events
+      }
+    }
+  }
+
+  return fullContent
 }

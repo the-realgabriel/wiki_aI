@@ -19,7 +19,17 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     body: JSON.stringify({ model: EMBEDDING_MODEL, input: text }),
   })
   if (!res.ok) {
-    throw new Error(`Embedding API error: ${await res.text()}`)
+    const err = await res.text()
+    if (res.status === 404) {
+      throw new Error(`Ollama embedding model "${EMBEDDING_MODEL}" not found. Pull it with: ollama pull ${EMBEDDING_MODEL}`)
+    }
+    if (res.status === 403) {
+      throw new Error(
+        `Ollama returned 403. The proxy may be forwarding auth headers. ` +
+        `Try setting VITE_OLLAMA_BASE_URL=http://localhost:11434 directly. Response: ${err}`
+      )
+    }
+    throw new Error(`Embedding API error (${res.status}): ${err}`)
   }
   const data = await res.json()
   return data.data?.[0]?.embedding ?? data.embedding
@@ -46,16 +56,10 @@ export function clearIndexCache() {
 }
 
 async function embedBatch(texts: string[]): Promise<number[][]> {
-  const embeddings: number[][] = []
-  for (const text of texts) {
-    try {
-      const emb = await generateEmbedding(text.slice(0, 2048))
-      embeddings.push(emb)
-    } catch {
-      embeddings.push([])
-    }
-  }
-  return embeddings
+  const results = await Promise.allSettled(
+    texts.map((text) => generateEmbedding(text.slice(0, 2048)))
+  )
+  return results.map((r) => (r.status === 'fulfilled' ? r.value : []))
 }
 
 export async function indexDocuments(docs: IndexedDoc[]): Promise<IndexedDoc[]> {

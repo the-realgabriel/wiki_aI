@@ -1,17 +1,16 @@
-import { useState, useRef, type FormEvent } from "react"
+import { useState, useRef, type FormEvent, type DragEvent } from "react"
 import { Button } from "#components/ui/button"
-import { UploadIcon, XIcon, Loader2, FileTextIcon, CheckCircle2Icon } from "lucide-react"
-import { getAccessToken } from "#lib/auth"
+import { UploadIcon, XIcon, Loader2, FileTextIcon, CheckCircle2Icon, FileSpreadsheet, FileArchive } from "lucide-react"
+import { cn } from "#lib/utils"
 
-const API_BASE = import.meta.env.VITE_API_URL ?? ""
-
-type UploadStatus = "idle" | "uploading" | "done" | "error"
+type UploadStatus = "idle" | "dragging" | "uploading" | "done" | "error"
 
 export function UploadDialog({ onClose }: { onClose: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const [status, setStatus] = useState<UploadStatus>("idle")
   const [error, setError] = useState("")
+  const [dragOver, setDragOver] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -23,12 +22,9 @@ export function UploadDialog({ onClose }: { onClose: () => void }) {
     const formData = new FormData()
     formData.append("file", file)
 
-    const token = getAccessToken()
-
     try {
-      const res = await fetch(`${API_BASE}/upload`, {
+      const res = await fetch("/api/upload", {
         method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
       })
 
@@ -45,12 +41,42 @@ export function UploadDialog({ onClose }: { onClose: () => void }) {
     }
   }
 
+  function handleDragOver(e: DragEvent) {
+    e.preventDefault()
+    setDragOver(true)
+  }
+
+  function handleDragLeave(e: DragEvent) {
+    e.preventDefault()
+    setDragOver(false)
+  }
+
+  function handleDrop(e: DragEvent) {
+    e.preventDefault()
+    setDragOver(false)
+    const droppedFile = e.dataTransfer.files[0]
+    if (droppedFile) {
+      setFile(droppedFile)
+      setStatus("idle")
+      setError("")
+    }
+  }
+
   const fileName = file?.name.toLowerCase() ?? ""
-  const isMd = fileName.endsWith(".md")
-  const isTxt = fileName.endsWith(".txt")
-  const isDocx = fileName.endsWith(".docx")
-  const isPdf = fileName.endsWith(".pdf")
-  const validFile = isMd || isTxt || isDocx || isPdf
+  const ext = fileName.split(".").pop()
+
+  function getFilePreviewIcon() {
+    switch (ext) {
+      case "md": case "txt": case "rtf": case "pdf": case "doc": case "docx": case "odt":
+        return <FileTextIcon className="size-10 text-blue-500" />
+      case "xls": case "xlsx": case "xlsm": case "csv": case "ods":
+        return <FileSpreadsheet className="size-10 text-green-600" />
+      case "ppt": case "pptx": case "pptm": case "odp":
+        return <FileArchive className="size-10 text-orange-500" />
+      default:
+        return <FileTextIcon className="size-10 text-primary" />
+    }
+  }
 
   const formatFileSize = (size: number) =>
     size < 1024
@@ -60,8 +86,8 @@ export function UploadDialog({ onClose }: { onClose: () => void }) {
       : `${(size / 1024 / 1024).toFixed(1)} MB`
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg border bg-card p-6 shadow-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-xl border bg-card p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Upload Document</h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -72,11 +98,19 @@ export function UploadDialog({ onClose }: { onClose: () => void }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div
             onClick={() => inputRef.current?.click()}
-            className="flex flex-col items-center gap-3 rounded-lg border-2 border-dashed p-8 cursor-pointer hover:bg-accent transition-colors"
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={cn(
+              "flex flex-col items-center gap-3 rounded-xl border-2 p-8 cursor-pointer transition-all duration-200",
+              dragOver
+                ? "border-primary border-dashed bg-primary/5"
+                : "border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-accent/30"
+            )}
           >
             {file ? (
               <>
-                <FileTextIcon className="size-10 text-primary" />
+                {getFilePreviewIcon()}
                 <div className="text-center">
                   <p className="font-medium">{file.name}</p>
                   <p className="text-sm text-muted-foreground">
@@ -88,9 +122,9 @@ export function UploadDialog({ onClose }: { onClose: () => void }) {
               <>
                 <UploadIcon className="size-10 text-muted-foreground" />
                 <div className="text-center">
-                  <p className="font-medium">Click to select a file</p>
+                  <p className="font-medium">Click to select or drag a file</p>
                   <p className="text-sm text-muted-foreground">
-                    Supported files: .md, .txt, .docx, .pdf
+                    .md, .txt, .pdf, .docx, .xlsx, .pptx and more
                   </p>
                 </div>
               </>
@@ -98,9 +132,9 @@ export function UploadDialog({ onClose }: { onClose: () => void }) {
             <input
               ref={inputRef}
               type="file"
-              accept=".md,.txt,text/markdown,text/plain,.docx,.pdf"
+              accept=".md,.txt,text/markdown,text/plain,.pdf,.docx,.xlsx,.xls,.xlsm,.pptx,.ppt,.pptm,.odt,.ods,.odp,.rtf,.csv,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.ms-powerpoint,application/rtf,text/csv,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation"
               className="hidden"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              onChange={(e) => { setFile(e.target.files?.[0] ?? null); setStatus("idle"); setError("") }}
             />
           </div>
 
@@ -110,8 +144,8 @@ export function UploadDialog({ onClose }: { onClose: () => void }) {
 
           <Button
             type="submit"
-            disabled={!file || !validFile || status === "uploading" || status === "done"}
-            className="w-full"
+            disabled={!file || status === "uploading" || status === "done"}
+            className="w-full shadow-sm"
           >
             {status === "uploading" ? (
               <>
@@ -130,12 +164,6 @@ export function UploadDialog({ onClose }: { onClose: () => void }) {
               </>
             )}
           </Button>
-
-          {file && !validFile && (
-            <p className="text-sm text-destructive text-center">
-              Only .md, .txt, .docx, and .pdf files are supported
-            </p>
-          )}
         </form>
       </div>
     </div>

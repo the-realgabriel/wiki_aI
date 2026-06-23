@@ -2,15 +2,29 @@ import { getAccessToken } from './auth';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
+function isAllowedOrigin(url: string): boolean {
+  if (!url.startsWith('http')) return true;
+  try {
+    const target = new URL(url);
+    const current = new URL(window.location.origin);
+    return target.origin === current.origin;
+  } catch {
+    return false;
+  }
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getAccessToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const url = `${API_BASE}${path}`;
+  if (token && isAllowedOrigin(url)) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const res = await fetch(url, { ...options, headers });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: 'Request failed' }));

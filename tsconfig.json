@@ -5,11 +5,13 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "moduleResolution": "bundler",
     "resolvePackageJsonImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "#/*": ["./src/*"]
     }
   }
 }

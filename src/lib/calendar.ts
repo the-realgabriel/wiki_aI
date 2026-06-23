@@ -1,12 +1,6 @@
-import { getRows, insertRow } from './rest'
-
-export type CalendarEvent = {
-  id?: string
-  date: string
-  title: string
-  type: "meeting" | "deadline" | "milestone"
-  description?: string
-}
+import type { CalendarEvent } from './calendar-api'
+export { fetchEvents, createEvent } from './calendar-api'
+export type { CalendarEvent }
 
 export type CalendarDay = {
   date: Date
@@ -14,22 +8,6 @@ export type CalendarDay = {
   isCurrentMonth: boolean
   isToday: boolean
   events: CalendarEvent[]
-}
-
-export async function fetchEvents(): Promise<CalendarEvent[]> {
-  const rows = await getRows("calendar_events", { order: "date.asc" })
-  return rows.map((r: any) => ({
-    id: r.id,
-    date: r.date,
-    title: r.title,
-    type: r.type,
-    description: r.description,
-  }))
-}
-
-export async function createEvent(event: Omit<CalendarEvent, "id">): Promise<CalendarEvent> {
-  const row = await insertRow("calendar_events", event as any)
-  return { id: row.id, ...event }
 }
 
 export function getMonthDays(year: number, month: number): CalendarDay[][] {
